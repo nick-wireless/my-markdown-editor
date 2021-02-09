@@ -1,17 +1,25 @@
 <template>
     <nav class="is-primary panel">
         <p class="panel-tabs">
-            <a>today</a>
-            <a>this week</a>
-            <a>this month</a>
+            <a v-for="period in periods" key="period">
+                {{ period }}
+            </a>
         </p>
     </nav>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue' // allows type definitions within the component.
+import { Period } from './types'
+
 export default defineComponent({
-    
+    setup() {
+        const periods:Period[] = ['today', 'this week', 'this month']
+
+        return {
+            periods
+        }
+    }
 })
 
 </script>
