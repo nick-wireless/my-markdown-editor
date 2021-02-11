@@ -1,24 +1,60 @@
 <template>
     <nav class="is-primary panel">
         <p class="panel-tabs">
-            <a v-for="period in periods" key="period" data-test="period"
+            <a v-for="period in periods" :key="period" data-test="period"
               :class="[ period === selectedPeriod ? 'is-active' : '' ]"
               @click="setPeriod(period)"
             >
                 {{ period }}
             </a>
         </p>
+        
+        <a data-test="post" class="panel-block" v-for="post in posts" :key="post.id">
+            <div>
+                <a> {{ post.title }} </a>
+                <div> {{ post.created.format('Do MMM') }} </div>
+            </div>
+        </a>
     </nav>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue' // allows type definitions within the component.
-import { Period } from './types'
+import { computed, defineComponent, ref } from 'vue' // allows type definitions within the component.
+
+import { Period, Post } from './types';
+import { todayPost, thisWeek, thisMonth } from './mocks'
+import moment from 'moment';
 
 export default defineComponent({
     setup() {
         const periods:Period[] = ['today', 'this week', 'this month']
         const selectedPeriod = ref<Period>('today')
+
+        // note, without 'computed'... would only run once... with computed, tracks references.
+        // also... took out types, leave to TS to figure out. 
+        // return... function... omits {} as starts with objects.
+        const posts = computed( () => [ todayPost, thisWeek, thisMonth ].filter(post => {
+            if(
+                selectedPeriod.value === 'today' &&
+                post.created.isAfter(moment().subtract(1, 'day'))
+            ) {
+                return true
+            }
+            if(
+                selectedPeriod.value === 'this week' &&
+                post.created.isAfter(moment().subtract(7, 'days'))
+            ) {
+                return true
+            }
+            if(
+                selectedPeriod.value === 'this month' &&
+                post.created.isAfter(moment().subtract(1, 'month'))
+            ) {
+                return true
+            }
+            return false
+            })
+        )
 
         const setPeriod = (period: Period) => {
             selectedPeriod.value = period
@@ -26,7 +62,8 @@ export default defineComponent({
         return {
             periods,
             selectedPeriod,
-            setPeriod
+            setPeriod,
+            posts
         }
     }
 })
