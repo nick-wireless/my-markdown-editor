@@ -20,17 +20,20 @@ import { todayPost, thisWeek, thisMonth } from './mocks'
 import moment from 'moment';
 import TimelinePost from './TimelinePost.vue'
 
+const delay = (ms: number) => new Promise(res => setTimeout(res, ms))
+
 export default defineComponent({
     components: {
         TimelinePost
     },
-    setup() {
+  async setup() {
         const periods:Period[] = ['today', 'this week', 'this month']
         const selectedPeriod = ref<Period>('today')
 
         // note, without 'computed'... would only run once... with computed, tracks references.
         // also... took out types, leave to TS to figure out. 
         // return... function... omits {} as starts with objects.
+        await delay(2000)
         const posts = computed( () => [ todayPost, thisWeek, thisMonth ].filter(post => {
             if(
                 selectedPeriod.value === 'today' &&
